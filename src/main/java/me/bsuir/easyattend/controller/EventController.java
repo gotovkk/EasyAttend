@@ -31,9 +31,15 @@ public class EventController {
             @RequestParam(value = "name", required = false) String name,
             @RequestParam(value = "location", required = false) String location) {
 
-        List<Event> results = (name != null) ? eventService.findByNameContaining(name) :
-                (location != null) ? eventService.findByLocationContaining(location) :
-                        eventService.findAll();
+        List<Event> results;
+
+        if (name != null) {
+            results = eventService.findByNameContaining(name);
+        } else if (location != null) {
+            results = eventService.findByLocationContaining(location);
+        } else {
+            results = eventService.findAll();
+        }
 
         return ResponseEntity.ok(results);
     }

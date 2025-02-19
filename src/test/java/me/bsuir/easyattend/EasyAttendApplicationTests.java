@@ -8,6 +8,7 @@ class EasyAttendApplicationTests {
 
 	@Test
 	void contextLoads() {
+		// будет в следующей лабе
 	}
 
 }
