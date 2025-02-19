@@ -2,6 +2,7 @@ package me.bsuir.easyattend.service;
 
 import java.util.List;
 import java.util.Optional;
+import me.bsuir.easyattend.exception.EventNotFoundException;
 import me.bsuir.easyattend.model.Event;
 
 public interface EventService {
@@ -16,4 +17,6 @@ public interface EventService {
     Event save(Event event);
 
     void deleteById(Long id);
+
+    Event findByIdOrThrow(Long eventId) throws EventNotFoundException;
 }

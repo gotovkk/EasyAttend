@@ -46,9 +46,8 @@ public class EventController {
 
     @GetMapping("/{eventId}")
     public ResponseEntity<Event> getEventById(@PathVariable Long eventId) {
-        return eventService.findById(eventId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        Event event = eventService.findByIdOrThrow(eventId);
+        return ResponseEntity.ok(event);
     }
 
     @PostMapping

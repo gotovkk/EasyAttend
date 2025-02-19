@@ -3,6 +3,7 @@ package me.bsuir.easyattend.service.impl;
 import java.util.List;
 import java.util.Optional;
 import me.bsuir.easyattend.dao.EventDao;
+import me.bsuir.easyattend.exception.EventNotFoundException;
 import me.bsuir.easyattend.model.Event;
 import me.bsuir.easyattend.service.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,5 +49,12 @@ public class EventServiceImpl implements EventService {
     @Override
     public void deleteById(Long id) {
         eventDao.deleteById(id);
+    }
+
+    @Override
+    public Event findByIdOrThrow(Long eventId) throws EventNotFoundException {
+        return eventDao.findById(eventId)
+                .orElseThrow(()
+                    -> new EventNotFoundException("Event not found with id: " + eventId));
     }
 }
