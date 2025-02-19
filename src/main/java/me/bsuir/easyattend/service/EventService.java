@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import me.bsuir.easyattend.model.Event;
 
-
-
 public interface EventService {
     Optional<Event> findById(Long id);
 
