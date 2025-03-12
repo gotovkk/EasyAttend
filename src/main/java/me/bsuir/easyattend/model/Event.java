@@ -3,30 +3,33 @@ package me.bsuir.easyattend.model;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+@Entity
+@Table(name = "events")
 public class Event {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
-    private String location;
+
+    @Column(nullable = false)
+    private String title;
+
     private String description;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
 
-    public Event(
-            Long id,
-            String name,
-            String location,
-            String description,
-            LocalDateTime startTime,
-            LocalDateTime endTime) {
-        this.id = id;
-        this.name = name;
-        this.location = location;
-        this.description = description;
-        this.startTime = startTime;
-        this.endTime = endTime;
-    }
+    @Column(nullable = false)
+    private LocalDateTime eventDate;
 
+    private String location;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "organizer_id", nullable = false)
+    private User organizer;
 }

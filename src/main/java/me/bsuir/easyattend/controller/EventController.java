@@ -1,19 +1,15 @@
 package me.bsuir.easyattend.controller;
 
-import java.util.List;
-import me.bsuir.easyattend.model.Event;
+import me.bsuir.easyattend.dto.create.EventCreateDto;
+import me.bsuir.easyattend.dto.get.EventGetDto;
 import me.bsuir.easyattend.service.EventService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/events")
@@ -26,55 +22,33 @@ public class EventController {
         this.eventService = eventService;
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<List<Event>> searchEvents(
-            @RequestParam(value = "name", required = false) String name,
-            @RequestParam(value = "location", required = false) String location) {
-
-        List<Event> results;
-
-        if (name != null) {
-            results = eventService.findByNameContaining(name);
-        } else if (location != null) {
-            results = eventService.findByLocationContaining(location);
-        } else {
-            results = eventService.findAll();
-        }
-
-        return ResponseEntity.ok(results);
-    }
-
-    @GetMapping("/{eventId}")
-    public ResponseEntity<Event> getEventById(@PathVariable Long eventId) {
-        Event event = eventService.findByIdOrThrow(eventId);
+    @GetMapping("/{id}")
+    public ResponseEntity<EventGetDto> getEventById(@PathVariable Long id) {
+        EventGetDto event = eventService.getEventById(id);
         return ResponseEntity.ok(event);
     }
 
-    @PostMapping
-    public ResponseEntity<Event> createEvent(@RequestBody Event event) {
-        if (event == null || event.getName() == null
-                || event.getName().isEmpty()
-                || event.getLocation() == null
-                || event.getLocation().isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
-        Event savedEvent = eventService.save(event);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedEvent);
-    }
-
-    @DeleteMapping("/{eventId}")
-    public ResponseEntity<Void> deleteEvent(@PathVariable Long eventId) {
-        if (eventService.findById(eventId).isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        eventService.deleteById(eventId);
-        return ResponseEntity.noContent().build();
-    }
-
     @GetMapping
-    public ResponseEntity<List<Event>> getAllEvents() {
-        List<Event> events = eventService.findAll();
+    public ResponseEntity<List<EventGetDto>> getAllEvents() {
+        List<EventGetDto> events = eventService.getAllEvents();
         return ResponseEntity.ok(events);
     }
 
+    @PostMapping
+    public ResponseEntity<EventGetDto> createEvent(@Valid @RequestBody EventCreateDto eventCreateDto) {
+        EventGetDto createdEvent = eventService.createEvent(eventCreateDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdEvent);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<EventGetDto> updateEvent(@PathVariable Long id, @Valid @RequestBody EventCreateDto eventCreateDto) {
+        EventGetDto updatedEvent = eventService.updateEvent(id, eventCreateDto);
+        return ResponseEntity.ok(updatedEvent);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteEvent(@PathVariable Long id) {
+        eventService.deleteEvent(id);
+        return ResponseEntity.noContent().build();
+    }
 }
