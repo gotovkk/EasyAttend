@@ -34,7 +34,7 @@ public class EventService {
     @Transactional(readOnly = true)
     public EventGetDto getEventById(Long id) {
         Event event = eventRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Event not found with id " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("" + id));
         return eventMapper.toDto(event);
     }
 
@@ -64,7 +64,7 @@ public class EventService {
     @Transactional
     public EventGetDto updateEvent(Long id, EventCreateDto eventCreateDto) {
         Event event = eventRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Event not found with id " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("" + id));
 
         User organizer = userRepository.findById(eventCreateDto.getOrganizerId())
                 .orElseThrow(()
@@ -81,7 +81,7 @@ public class EventService {
     @Transactional
     public void deleteEvent(Long id) {
         Event event = eventRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Event not found with id " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("" + id));
         eventRepository.delete(event);
     }
 }

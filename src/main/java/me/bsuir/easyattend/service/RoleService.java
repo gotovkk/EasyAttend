@@ -50,7 +50,7 @@ public class RoleService {
     @Transactional
     public RoleGetDto updateRole(Long id, RoleCreateDto roleCreateDto) {
         Role role = roleRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Role not found with id " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Rock not found with id " + id));
 
         roleMapper.updateRoleFromDto(roleCreateDto, role);
         Role updatedRole = roleRepository.save(role);

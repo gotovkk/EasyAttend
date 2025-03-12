@@ -41,7 +41,7 @@ public class RegistrationStatusService {
         RegistrationStatus registrationStatus
                 = registrationStatusRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "RegistrationStatus not found with id " + id));
+                        "1" + id));
         return registrationStatusMapper.toDto(registrationStatus);
     }
 
@@ -63,12 +63,12 @@ public class RegistrationStatusService {
         Event event = eventRepository.findById(registrationStatusCreateDto.getEventId())
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
-                                "Event not found with id "
+                                "2"
                                         + registrationStatusCreateDto.getEventId()));
         User user = userRepository.findById(registrationStatusCreateDto.getUserId())
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
-                                "User not found with id "
+                                "3"
                                         + registrationStatusCreateDto.getUserId()));
 
         registrationStatus.setEvent(event);
@@ -89,20 +89,20 @@ public class RegistrationStatusService {
         RegistrationStatus registrationStatus = registrationStatusRepository.findById(id)
                 .orElseThrow(()
                         -> new ResourceNotFoundException(
-                                "RegistrationStatus not found with id "
+                                "12"
                                         + id)
                 );
 
         Event event = eventRepository.findById(registrationStatusCreateDto.getEventId())
                 .orElseThrow(()
                         -> new ResourceNotFoundException(
-                                "Event not found with id "
+                                "us"
                                         + registrationStatusCreateDto.getEventId())
                 );
         User user = userRepository.findById(registrationStatusCreateDto.getUserId())
                 .orElseThrow(()
                         -> new ResourceNotFoundException(
-                                "User not found with id "
+                                "sigma"
                                         + registrationStatusCreateDto.getUserId())
                 );
 
