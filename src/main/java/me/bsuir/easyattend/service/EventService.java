@@ -1,19 +1,17 @@
 package me.bsuir.easyattend.service;
 
-import me.bsuir.easyattend.repository.EventRepository;
+import java.util.List;
 import me.bsuir.easyattend.dto.create.EventCreateDto;
 import me.bsuir.easyattend.dto.get.EventGetDto;
-import me.bsuir.easyattend.model.Event;
-import me.bsuir.easyattend.model.User;
 import me.bsuir.easyattend.exception.ResourceNotFoundException;
 import me.bsuir.easyattend.mapper.EventMapper;
+import me.bsuir.easyattend.model.Event;
+import me.bsuir.easyattend.model.User;
+import me.bsuir.easyattend.repository.EventRepository;
 import me.bsuir.easyattend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class EventService {
@@ -23,7 +21,11 @@ public class EventService {
     private final UserRepository userRepository;
 
     @Autowired
-    public EventService(EventRepository eventRepository, EventMapper eventMapper, UserRepository userRepository) {
+    public EventService(
+            EventRepository eventRepository,
+            EventMapper eventMapper,
+            UserRepository userRepository
+    ) {
         this.eventRepository = eventRepository;
         this.eventMapper = eventMapper;
         this.userRepository = userRepository;
@@ -41,7 +43,7 @@ public class EventService {
         List<Event> events = eventRepository.findAll();
         return events.stream()
                 .map(eventMapper::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional
@@ -49,7 +51,10 @@ public class EventService {
         Event event = eventMapper.toEntity(eventCreateDto);
 
         User organizer = userRepository.findById(eventCreateDto.getOrganizerId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + eventCreateDto.getOrganizerId()));
+                .orElseThrow(()
+                        -> new ResourceNotFoundException(
+                                "User not found with id "
+                                        + eventCreateDto.getOrganizerId()));
         event.setOrganizer(organizer);
 
         Event savedEvent = eventRepository.save(event);
@@ -62,7 +67,10 @@ public class EventService {
                 .orElseThrow(() -> new ResourceNotFoundException("Event not found with id " + id));
 
         User organizer = userRepository.findById(eventCreateDto.getOrganizerId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + eventCreateDto.getOrganizerId()));
+                .orElseThrow(()
+                        -> new ResourceNotFoundException(
+                                "User not found with id "
+                                        + eventCreateDto.getOrganizerId()));
         event.setOrganizer(organizer);
 
         eventMapper.updateEventFromDto(eventCreateDto, event);

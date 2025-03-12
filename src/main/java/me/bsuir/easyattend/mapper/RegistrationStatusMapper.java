@@ -1,25 +1,27 @@
 package me.bsuir.easyattend.mapper;
 
-import me.bsuir.easyattend.repository.EventRepository;
-import me.bsuir.easyattend.repository.UserRepository;
 import me.bsuir.easyattend.dto.create.RegistrationStatusCreateDto;
 import me.bsuir.easyattend.dto.get.RegistrationStatusGetDto;
-import me.bsuir.easyattend.model.RegistrationStatus;
-import me.bsuir.easyattend.model.Event;
-import me.bsuir.easyattend.model.User;
 import me.bsuir.easyattend.exception.ResourceNotFoundException;
-import org.mapstruct.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import me.bsuir.easyattend.model.Event;
+import me.bsuir.easyattend.model.RegistrationStatus;
+import me.bsuir.easyattend.model.User;
+import me.bsuir.easyattend.repository.EventRepository;
+import me.bsuir.easyattend.repository.UserRepository;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
+import org.mapstruct.NullValueCheckStrategy;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
-@Mapper(componentModel = "spring", uses = {UserMapper.class, EventMapper.class},
+@Mapper(
+        componentModel = "spring", uses = {UserMapper.class, EventMapper.class},
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
         nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
 public abstract class RegistrationStatusMapper {
 
-    @Autowired
     protected UserRepository userRepository;
-
-    @Autowired
     protected EventRepository eventRepository;
 
     @Mapping(target = "id", ignore = true)
@@ -34,16 +36,24 @@ public abstract class RegistrationStatusMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(source = "eventId", target = "event")
     @Mapping(source = "userId", target = "user")
-    public abstract void updateRegistrationStatusFromDto(RegistrationStatusCreateDto dto, @MappingTarget RegistrationStatus entity);
+    public abstract void updateRegistrationStatusFromDto(
+            RegistrationStatusCreateDto dto,
+            @MappingTarget RegistrationStatus entity
+    );
 
     @Named("userFromId")
     protected User userFromId(Long userId) {
         return userId == null ? null : userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                                "User not found with id " + userId
+                        )
+                );
     }
 
     protected Event eventFromId(Long eventId) {
         return eventId == null ? null : eventRepository.findById(eventId)
-                .orElseThrow(() -> new ResourceNotFoundException("Event not found with id " + eventId));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Event not found with id "
+                                + eventId));
     }
 }

@@ -3,11 +3,11 @@ package me.bsuir.easyattend.mapper;
 import me.bsuir.easyattend.dto.create.RoleCreateDto;
 import me.bsuir.easyattend.dto.get.RoleGetDto;
 import me.bsuir.easyattend.model.Role;
+import me.bsuir.easyattend.model.RoleType;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
-import me.bsuir.easyattend.model.RoleType;
 
 
 @Mapper(componentModel = "spring",

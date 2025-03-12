@@ -1,19 +1,19 @@
 package me.bsuir.easyattend.mapper;
 
-import me.bsuir.easyattend.repository.UserRepository;
 import me.bsuir.easyattend.dto.create.UserCreateDto;
 import me.bsuir.easyattend.dto.get.UserGetDto;
 import me.bsuir.easyattend.model.User;
-import org.mapstruct.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-
+import me.bsuir.easyattend.repository.UserRepository;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper(componentModel = "spring", uses = {RoleMapper.class},
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public abstract class UserMapper {
 
-    @Autowired
     protected UserRepository userRepository;
 
     @Mapping(target = "id", ignore = true)

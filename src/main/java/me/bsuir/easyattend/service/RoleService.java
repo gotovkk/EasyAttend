@@ -1,18 +1,17 @@
 package me.bsuir.easyattend.service;
 
-import me.bsuir.easyattend.repository.RoleRepository;
+import java.util.List;
 import me.bsuir.easyattend.dto.create.RoleCreateDto;
 import me.bsuir.easyattend.dto.get.RoleGetDto;
-import me.bsuir.easyattend.model.Role;
-import me.bsuir.easyattend.model.RoleType;
 import me.bsuir.easyattend.exception.ResourceNotFoundException;
 import me.bsuir.easyattend.mapper.RoleMapper;
+import me.bsuir.easyattend.model.Role;
+import me.bsuir.easyattend.model.RoleType;
+import me.bsuir.easyattend.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class RoleService {
@@ -38,7 +37,7 @@ public class RoleService {
         List<Role> roles = roleRepository.findAll();
         return roles.stream()
                 .map(roleMapper::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional

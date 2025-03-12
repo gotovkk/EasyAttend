@@ -1,11 +1,11 @@
 package me.bsuir.easyattend.dto.get;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.time.LocalDateTime;
+import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-import java.util.Set;
 
 @Getter
 @Setter

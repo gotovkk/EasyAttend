@@ -1,15 +1,21 @@
 package me.bsuir.easyattend.controller;
 
+import jakarta.validation.Valid;
+import java.util.List;
 import me.bsuir.easyattend.dto.create.EventCreateDto;
 import me.bsuir.easyattend.dto.get.EventGetDto;
 import me.bsuir.easyattend.service.EventService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/events")
@@ -35,13 +41,18 @@ public class EventController {
     }
 
     @PostMapping
-    public ResponseEntity<EventGetDto> createEvent(@Valid @RequestBody EventCreateDto eventCreateDto) {
+    public ResponseEntity<EventGetDto> createEvent(
+            @Valid @RequestBody EventCreateDto eventCreateDto
+    ) {
         EventGetDto createdEvent = eventService.createEvent(eventCreateDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdEvent);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<EventGetDto> updateEvent(@PathVariable Long id, @Valid @RequestBody EventCreateDto eventCreateDto) {
+    public ResponseEntity<EventGetDto> updateEvent(
+            @PathVariable Long id,
+            @Valid @RequestBody EventCreateDto eventCreateDto
+    ) {
         EventGetDto updatedEvent = eventService.updateEvent(id, eventCreateDto);
         return ResponseEntity.ok(updatedEvent);
     }
