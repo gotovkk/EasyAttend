@@ -3,11 +3,15 @@ package me.bsuir.easyattend.service;
 import java.util.List;
 import java.util.stream.Collectors;
 import me.bsuir.easyattend.dto.create.EventCreateDto;
-import me.bsuir.easyattend.dto.get.*;
+import me.bsuir.easyattend.dto.get.EventAttendeeDto;
+import me.bsuir.easyattend.dto.get.EventGetDto;
 import me.bsuir.easyattend.exception.ResourceNotFoundException;
 import me.bsuir.easyattend.mapper.EventMapper;
-import me.bsuir.easyattend.model.*;
-import me.bsuir.easyattend.repository.*;
+import me.bsuir.easyattend.model.Event;
+import me.bsuir.easyattend.model.User;
+import me.bsuir.easyattend.repository.EventRepository;
+import me.bsuir.easyattend.repository.RegistrationStatusRepository;
+import me.bsuir.easyattend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +21,7 @@ public class EventService {
 
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
-    private final RegistrationStatusRepository registrationStatusRepository; // Add RegistrationStatusRepository
+    private final RegistrationStatusRepository registrationStatusRepository;
     private final UserRepository userRepository;
 
     @Autowired
@@ -25,12 +29,17 @@ public class EventService {
             EventRepository eventRepository,
             EventMapper eventMapper,
             UserRepository userRepository,
-            RegistrationStatusRepository registrationStatusRepository // Inject RegistrationStatusRepository
+            RegistrationStatusRepository registrationStatusRepository
     ) {
         this.eventRepository = eventRepository;
         this.eventMapper = eventMapper;
         this.userRepository = userRepository;
         this.registrationStatusRepository = registrationStatusRepository;
+    }
+
+    @Transactional
+    public void removeAttendeeFromEvent(Long eventId, Long userId) {
+        registrationStatusRepository.deleteByEventIdAndUserId(eventId, userId);
     }
 
     @Transactional(readOnly = true)
@@ -42,7 +51,7 @@ public class EventService {
 
     @Transactional(readOnly = true)
     public List<EventAttendeeDto> getAttendeesByEventId(Long eventId) {
-        List<User> attendees = registrationStatusRepository.findUsersByEvent_Id(eventId);
+        List<User> attendees = registrationStatusRepository.findUsersByEventId(eventId);
         return attendees.stream()
                 .map(this::convertToEventAttendeeDto)
                 .collect(Collectors.toList());
@@ -102,11 +111,6 @@ public class EventService {
     public void deleteEvent(Long id) {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Event not found with id " + id));
-
-        List<RegistrationStatus> registrationStatuses = registrationStatusRepository.findByEvent_Id(id);
-        registrationStatusRepository.deleteAll(registrationStatuses);
-
-        // Now, delete the event
         eventRepository.delete(event);
     }
 }

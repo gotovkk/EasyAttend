@@ -4,7 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import me.bsuir.easyattend.dto.create.RegistrationStatusCreateDto;
-import me.bsuir.easyattend.dto.get.*;
+import me.bsuir.easyattend.dto.get.EventGetDto;
+import me.bsuir.easyattend.dto.get.RegistrationStatusGetDto;
 import me.bsuir.easyattend.exception.ResourceNotFoundException;
 import me.bsuir.easyattend.mapper.*;
 import me.bsuir.easyattend.model.Event;
@@ -51,7 +52,7 @@ public class RegistrationStatusService {
     }
 
     public List<RegistrationStatusGetDto> getRegistrationStatusesByUserId(Long userId) {
-        List<RegistrationStatus> registrationStatuses = registrationStatusRepository.findByUser_Id(userId);
+        List<RegistrationStatus> registrationStatuses = registrationStatusRepository.findByUserId(userId);
         return registrationStatuses.stream()
                 .map(registrationStatusMapper::toDto) // Используем маппер
                 .collect(Collectors.toList());
@@ -146,7 +147,7 @@ public class RegistrationStatusService {
     }
 
     public List<EventGetDto> getEventsByUserId(Long userId) {
-        List<RegistrationStatus> registrationStatuses = registrationStatusRepository.findByUser_Id(userId);
+        List<RegistrationStatus> registrationStatuses = registrationStatusRepository.findByUserId(userId);
         return registrationStatuses.stream()
                 .map(rs -> eventMapper.toDto(rs.getEvent())) // Use eventMapper toDto instead
                 .collect(Collectors.toList());

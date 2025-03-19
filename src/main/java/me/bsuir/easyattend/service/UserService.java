@@ -14,6 +14,8 @@ import me.bsuir.easyattend.mapper.UserMapper;
 import me.bsuir.easyattend.model.Role;
 import me.bsuir.easyattend.model.RoleType;
 import me.bsuir.easyattend.model.User;
+import me.bsuir.easyattend.repository.EventRepository;
+import me.bsuir.easyattend.repository.RegistrationStatusRepository;
 import me.bsuir.easyattend.repository.RoleRepository;
 import me.bsuir.easyattend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +39,9 @@ public class UserService {
             RoleRepository roleRepository,
             PasswordEncoder passwordEncoder,
             RoleService roleService,
-            RoleMapper roleMapper
+            RoleMapper roleMapper,
+            EventRepository eventRepository,       // Inject EventRepository
+            RegistrationStatusRepository registrationStatusRepository // Inject RegistrationStatusRepository
     ) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
@@ -49,7 +53,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserGetDto getUserById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + id));
         return userMapper.toDto(user);
     }
 
@@ -72,8 +76,8 @@ public class UserService {
                 Role role = roleRepository.findById(roleId)
                         .orElseThrow(()
                                 -> new ResourceNotFoundException(
-                                        "Role not found with id "
-                                                + roleId));
+                                "Role not found with id "
+                                        + roleId));
                 roles.add(role);
             });
         } else {
@@ -119,7 +123,7 @@ public class UserService {
                 Role role = roleRepository.findById(roleId)
                         .orElseThrow(()
                                 -> new ResourceNotFoundException(
-                                        "Role not found with id " + roleId));
+                                "Role not found with id " + roleId));
                 newRoles.add(role);
             }
             user.setRoles(newRoles);

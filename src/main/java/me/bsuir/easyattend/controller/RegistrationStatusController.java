@@ -3,7 +3,8 @@ package me.bsuir.easyattend.controller;
 import jakarta.validation.Valid;
 import java.util.List;
 import me.bsuir.easyattend.dto.create.RegistrationStatusCreateDto;
-import me.bsuir.easyattend.dto.get.*;
+import me.bsuir.easyattend.dto.get.EventGetDto;
+import me.bsuir.easyattend.dto.get.RegistrationStatusGetDto;
 import me.bsuir.easyattend.service.RegistrationStatusService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,8 +32,11 @@ public class RegistrationStatusController {
 
 
     @GetMapping("/by-user/{userId}")
-    public ResponseEntity<List<RegistrationStatusGetDto>> getRegistrationStatusesByUserId(@PathVariable Long userId) {
-        List<RegistrationStatusGetDto> registrationStatuses = registrationStatusService.getRegistrationStatusesByUserId(userId);
+    public ResponseEntity<List<RegistrationStatusGetDto>> getRegistrationStatusesByUserId(
+            @PathVariable Long userId
+    ) {
+        List<RegistrationStatusGetDto> registrationStatuses
+                = registrationStatusService.getRegistrationStatusesByUserId(userId);
         return ResponseEntity.ok(registrationStatuses);
     }
 
@@ -64,7 +68,7 @@ public class RegistrationStatusController {
     ) {
         RegistrationStatusGetDto createdRegistrationStatus
                 = registrationStatusService.createRegistrationStatus(
-                        registrationStatusCreateDto
+                registrationStatusCreateDto
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(createdRegistrationStatus);
     }
@@ -76,7 +80,7 @@ public class RegistrationStatusController {
     ) {
         RegistrationStatusGetDto updatedRegistrationStatus
                 = registrationStatusService.updateRegistrationStatus(
-                        id, registrationStatusCreateDto
+                id, registrationStatusCreateDto
         );
         return ResponseEntity.ok(updatedRegistrationStatus);
     }

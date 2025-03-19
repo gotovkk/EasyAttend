@@ -15,5 +15,5 @@ public class RegistrationStatusCreateDto {
     private Long userId;
 
     @NotNull(message = "Status cannot be null")
-    private String status; // Or use enum RegistrationStatusType
+    private String status;
 }

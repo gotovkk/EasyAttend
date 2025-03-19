@@ -24,7 +24,7 @@ import lombok.ToString;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = {"roles", "organizedEvents"}) // Added "organizedEvents" to exclude
+@ToString(exclude = {"roles", "organizedEvents"})
 @Entity
 @Table(name = "users")
 public class User {
@@ -57,7 +57,6 @@ public class User {
     @OneToMany(
             mappedBy = "organizer",
             fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL,
-            orphanRemoval = true)
+            cascade = CascadeType.ALL)
     private Set<Event> organizedEvents;
 }
