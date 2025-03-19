@@ -3,7 +3,7 @@ package me.bsuir.easyattend.controller;
 import jakarta.validation.Valid;
 import java.util.List;
 import me.bsuir.easyattend.dto.create.EventCreateDto;
-import me.bsuir.easyattend.dto.get.EventGetDto;
+import me.bsuir.easyattend.dto.get.*;
 import me.bsuir.easyattend.service.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -61,5 +61,11 @@ public class EventController {
     public ResponseEntity<Void> deleteEvent(@PathVariable Long id) {
         eventService.deleteEvent(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/attendees") // Changed mapping
+    public ResponseEntity<List<EventAttendeeDto>> getAttendeesByEventId(@PathVariable Long id) {
+        List<EventAttendeeDto> attendees = eventService.getAttendeesByEventId(id);
+        return ResponseEntity.ok(attendees);
     }
 }

@@ -2,10 +2,11 @@ package me.bsuir.easyattend.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 import me.bsuir.easyattend.dto.create.RegistrationStatusCreateDto;
-import me.bsuir.easyattend.dto.get.RegistrationStatusGetDto;
+import me.bsuir.easyattend.dto.get.*;
 import me.bsuir.easyattend.exception.ResourceNotFoundException;
-import me.bsuir.easyattend.mapper.RegistrationStatusMapper;
+import me.bsuir.easyattend.mapper.*;
 import me.bsuir.easyattend.model.Event;
 import me.bsuir.easyattend.model.RegistrationStatus;
 import me.bsuir.easyattend.model.User;
@@ -23,34 +24,46 @@ public class RegistrationStatusService {
     private final RegistrationStatusMapper registrationStatusMapper;
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
+    private final EventMapper eventMapper; // Add EventMapper
 
     @Autowired
     public RegistrationStatusService(
             RegistrationStatusRepository registrationStatusRepository,
             RegistrationStatusMapper registrationStatusMapper,
             EventRepository eventRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository,
+            EventMapper eventMapper
+    ) {
         this.registrationStatusRepository = registrationStatusRepository;
         this.registrationStatusMapper = registrationStatusMapper;
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
-    }
+        this.eventMapper = eventMapper; //
+        }
 
     @Transactional(readOnly = true)
     public RegistrationStatusGetDto getRegistrationStatusById(Long id) {
         RegistrationStatus registrationStatus
                 = registrationStatusRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "1" + id));
+                        "RegistrationStatus not found with id " + id));
         return registrationStatusMapper.toDto(registrationStatus);
     }
+
+    public List<RegistrationStatusGetDto> getRegistrationStatusesByUserId(Long userId) {
+        List<RegistrationStatus> registrationStatuses = registrationStatusRepository.findByUser_Id(userId);
+        return registrationStatuses.stream()
+                .map(registrationStatusMapper::toDto) // Используем маппер
+                .collect(Collectors.toList());
+    }
+
 
     @Transactional(readOnly = true)
     public List<RegistrationStatusGetDto> getAllRegistrationStatuses() {
         List<RegistrationStatus> registrationStatuses = registrationStatusRepository.findAll();
         return registrationStatuses.stream()
                 .map(registrationStatusMapper::toDto)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -63,12 +76,12 @@ public class RegistrationStatusService {
         Event event = eventRepository.findById(registrationStatusCreateDto.getEventId())
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
-                                "2"
+                                "Event not found with id "
                                         + registrationStatusCreateDto.getEventId()));
         User user = userRepository.findById(registrationStatusCreateDto.getUserId())
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
-                                "3"
+                                "User not found with id "
                                         + registrationStatusCreateDto.getUserId()));
 
         registrationStatus.setEvent(event);
@@ -89,21 +102,21 @@ public class RegistrationStatusService {
         RegistrationStatus registrationStatus = registrationStatusRepository.findById(id)
                 .orElseThrow(()
                         -> new ResourceNotFoundException(
-                                "12"
-                                        + id)
+                        "RegistrationStatus not found with id "
+                                + id)
                 );
 
         Event event = eventRepository.findById(registrationStatusCreateDto.getEventId())
                 .orElseThrow(()
                         -> new ResourceNotFoundException(
-                                "us"
-                                        + registrationStatusCreateDto.getEventId())
+                        "Event not found with id "
+                                + registrationStatusCreateDto.getEventId())
                 );
         User user = userRepository.findById(registrationStatusCreateDto.getUserId())
                 .orElseThrow(()
                         -> new ResourceNotFoundException(
-                                "sigma"
-                                        + registrationStatusCreateDto.getUserId())
+                        "User not found with id "
+                                + registrationStatusCreateDto.getUserId())
                 );
 
         registrationStatus.setEvent(event);
@@ -126,9 +139,16 @@ public class RegistrationStatusService {
         RegistrationStatus registrationStatus = registrationStatusRepository.findById(id)
                 .orElseThrow(()
                         -> new ResourceNotFoundException(
-                                "RegistrationStatus not found with id "
-                                        + id)
+                        "RegistrationStatus not found with id "
+                                + id)
                 );
         registrationStatusRepository.delete(registrationStatus);
+    }
+
+    public List<EventGetDto> getEventsByUserId(Long userId) {
+        List<RegistrationStatus> registrationStatuses = registrationStatusRepository.findByUser_Id(userId);
+        return registrationStatuses.stream()
+                .map(rs -> eventMapper.toDto(rs.getEvent())) // Use eventMapper toDto instead
+                .collect(Collectors.toList());
     }
 }

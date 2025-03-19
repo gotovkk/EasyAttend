@@ -3,7 +3,7 @@ package me.bsuir.easyattend.controller;
 import jakarta.validation.Valid;
 import java.util.List;
 import me.bsuir.easyattend.dto.create.RegistrationStatusCreateDto;
-import me.bsuir.easyattend.dto.get.RegistrationStatusGetDto;
+import me.bsuir.easyattend.dto.get.*;
 import me.bsuir.easyattend.service.RegistrationStatusService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,6 +27,19 @@ public class RegistrationStatusController {
     @Autowired
     public RegistrationStatusController(RegistrationStatusService registrationStatusService) {
         this.registrationStatusService = registrationStatusService;
+    }
+
+
+    @GetMapping("/by-user/{userId}")
+    public ResponseEntity<List<RegistrationStatusGetDto>> getRegistrationStatusesByUserId(@PathVariable Long userId) {
+        List<RegistrationStatusGetDto> registrationStatuses = registrationStatusService.getRegistrationStatusesByUserId(userId);
+        return ResponseEntity.ok(registrationStatuses);
+    }
+
+    @GetMapping("/events-by-user/{userId}")
+    public ResponseEntity<List<EventGetDto>> getEventsByUserId(@PathVariable Long userId) {
+        List<EventGetDto> events = registrationStatusService.getEventsByUserId(userId);
+        return ResponseEntity.ok(events);
     }
 
     @GetMapping("/{id}")

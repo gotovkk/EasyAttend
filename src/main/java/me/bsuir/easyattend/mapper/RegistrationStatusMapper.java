@@ -14,6 +14,7 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 import org.mapstruct.NullValueCheckStrategy;
 import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(
         componentModel = "spring", uses = {UserMapper.class, EventMapper.class},
@@ -21,7 +22,10 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
         nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
 public abstract class RegistrationStatusMapper {
 
+    @Autowired
     protected UserRepository userRepository;
+
+    @Autowired
     protected EventRepository eventRepository;
 
     @Mapping(target = "id", ignore = true)

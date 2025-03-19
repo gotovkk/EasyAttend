@@ -24,11 +24,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf.disable()) // Use lambda for simpler syntax
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll()
+                        .anyRequest().permitAll() // Allow all requests without authentication
                 )
-                .httpBasic(withDefaults())
+                .httpBasic(withDefaults()) // Enable HTTP Basic authentication for simplicity
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(STATELESS));
 

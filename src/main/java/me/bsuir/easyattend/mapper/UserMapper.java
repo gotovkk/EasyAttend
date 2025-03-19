@@ -9,11 +9,14 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.springframework.beans.factory.annotation.Autowired;
+
 
 @Mapper(componentModel = "spring", uses = {RoleMapper.class},
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public abstract class UserMapper {
 
+    @Autowired
     protected UserRepository userRepository;
 
     @Mapping(target = "id", ignore = true)

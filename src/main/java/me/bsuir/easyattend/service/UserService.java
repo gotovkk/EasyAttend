@@ -72,7 +72,7 @@ public class UserService {
                 Role role = roleRepository.findById(roleId)
                         .orElseThrow(()
                                 -> new ResourceNotFoundException(
-                                        "Rock not found with id "
+                                        "Role not found with id "
                                                 + roleId));
                 roles.add(role);
             });
@@ -105,7 +105,7 @@ public class UserService {
     @Transactional
     public UserGetDto updateUser(Long id, UserCreateDto userCreateDto) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Usr not found with id " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + id));
 
         userMapper.updateUserFromDto(userCreateDto, user);
 

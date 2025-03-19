@@ -18,6 +18,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.*;
 
 @Getter
 @Setter
@@ -34,6 +35,7 @@ public class RegistrationStatus {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE) // Add this
     private Event event;
 
     @ManyToOne(fetch = FetchType.LAZY)

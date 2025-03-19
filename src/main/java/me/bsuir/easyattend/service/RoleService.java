@@ -1,6 +1,7 @@
 package me.bsuir.easyattend.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import me.bsuir.easyattend.dto.create.RoleCreateDto;
 import me.bsuir.easyattend.dto.get.RoleGetDto;
 import me.bsuir.easyattend.exception.ResourceNotFoundException;
@@ -37,7 +38,7 @@ public class RoleService {
         List<Role> roles = roleRepository.findAll();
         return roles.stream()
                 .map(roleMapper::toDto)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -50,7 +51,7 @@ public class RoleService {
     @Transactional
     public RoleGetDto updateRole(Long id, RoleCreateDto roleCreateDto) {
         Role role = roleRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Rock not found with id " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found with id " + id));
 
         roleMapper.updateRoleFromDto(roleCreateDto, role);
         Role updatedRole = roleRepository.save(role);
