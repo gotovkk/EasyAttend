@@ -4,16 +4,19 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import me.bsuir.easyattend.dto.create.RegistrationStatusCreateDto;
+import me.bsuir.easyattend.dto.get.ConfirmedUserDto;
 import me.bsuir.easyattend.dto.get.EventGetDto;
 import me.bsuir.easyattend.dto.get.RegistrationStatusGetDto;
 import me.bsuir.easyattend.exception.ResourceNotFoundException;
-import me.bsuir.easyattend.mapper.*;
+import me.bsuir.easyattend.mapper.EventMapper;
+import me.bsuir.easyattend.mapper.RegistrationStatusMapper;
 import me.bsuir.easyattend.model.Event;
 import me.bsuir.easyattend.model.RegistrationStatus;
 import me.bsuir.easyattend.model.User;
 import me.bsuir.easyattend.repository.EventRepository;
 import me.bsuir.easyattend.repository.RegistrationStatusRepository;
 import me.bsuir.easyattend.repository.UserRepository;
+import me.bsuir.easyattend.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +29,8 @@ public class RegistrationStatusService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final EventMapper eventMapper; // Add EventMapper
+    private final InMemoryCache<String, List<RegistrationStatusGetDto>> registrationStatusCache;
+    private final InMemoryCache<String, List<ConfirmedUserDto>> confirmedUsersCache;
 
     @Autowired
     public RegistrationStatusService(
@@ -33,14 +38,34 @@ public class RegistrationStatusService {
             RegistrationStatusMapper registrationStatusMapper,
             EventRepository eventRepository,
             UserRepository userRepository,
-            EventMapper eventMapper
+            EventMapper eventMapper,
+            InMemoryCache<String, List<RegistrationStatusGetDto>> registrationStatusCache,
+            InMemoryCache<String, List<ConfirmedUserDto>> confirmedUsersCache
     ) {
         this.registrationStatusRepository = registrationStatusRepository;
         this.registrationStatusMapper = registrationStatusMapper;
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
-        this.eventMapper = eventMapper; //
+        this.eventMapper = eventMapper;
+        this.registrationStatusCache = registrationStatusCache;
+        this.confirmedUsersCache = confirmedUsersCache;
+    }
+
+    public List<RegistrationStatusGetDto> getRegistrationStatusesByEventIdAndUserLastName(Long eventId, String lastName) {
+        String cacheKey = "eventId:" + eventId + ",lastName:" + lastName;
+        List<RegistrationStatusGetDto> cachedResult = registrationStatusCache.get(cacheKey);
+        if (cachedResult != null) {
+            return cachedResult;
         }
+
+        List<RegistrationStatus> registrationStatuses = registrationStatusRepository.findByEventIdAndUserLastName(eventId, lastName);
+        List<RegistrationStatusGetDto> dtos = registrationStatuses.stream()
+                .map(registrationStatusMapper::toDto)
+                .collect(Collectors.toList());
+
+        registrationStatusCache.put(cacheKey, dtos);
+        return dtos;
+    }
 
     @Transactional(readOnly = true)
     public RegistrationStatusGetDto getRegistrationStatusById(Long id) {
@@ -52,7 +77,8 @@ public class RegistrationStatusService {
     }
 
     public List<RegistrationStatusGetDto> getRegistrationStatusesByUserId(Long userId) {
-        List<RegistrationStatus> registrationStatuses = registrationStatusRepository.findByUserId(userId);
+        List<RegistrationStatus> registrationStatuses
+                = registrationStatusRepository.findByUserId(userId);
         return registrationStatuses.stream()
                 .map(registrationStatusMapper::toDto) // Используем маппер
                 .collect(Collectors.toList());
@@ -147,9 +173,22 @@ public class RegistrationStatusService {
     }
 
     public List<EventGetDto> getEventsByUserId(Long userId) {
-        List<RegistrationStatus> registrationStatuses = registrationStatusRepository.findByUserId(userId);
+        List<RegistrationStatus> registrationStatuses
+                = registrationStatusRepository.findByUserId(userId);
         return registrationStatuses.stream()
-                .map(rs -> eventMapper.toDto(rs.getEvent())) // Use eventMapper toDto instead
+                .map(rs -> eventMapper.toDto(rs.getEvent()))
                 .collect(Collectors.toList());
+    }
+
+    public List<ConfirmedUserDto> getConfirmedUsersByEventIdAndLastName(Long eventId, String lastName) {
+        String cacheKey = "eventId:" + eventId + ",lastName:" + lastName;
+        List<ConfirmedUserDto> cachedResult = confirmedUsersCache.get(cacheKey);
+        if (cachedResult != null) {
+            return cachedResult;
+        }
+
+        List<ConfirmedUserDto> confirmedUsers = registrationStatusRepository.findConfirmedUsersByEventIdAndLastName(eventId, lastName);
+        confirmedUsersCache.put(cacheKey, confirmedUsers);
+        return confirmedUsers;
     }
 }

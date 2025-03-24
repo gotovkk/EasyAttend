@@ -3,6 +3,7 @@ package me.bsuir.easyattend.controller;
 import jakarta.validation.Valid;
 import java.util.List;
 import me.bsuir.easyattend.dto.create.RegistrationStatusCreateDto;
+import me.bsuir.easyattend.dto.get.ConfirmedUserDto;
 import me.bsuir.easyattend.dto.get.EventGetDto;
 import me.bsuir.easyattend.dto.get.RegistrationStatusGetDto;
 import me.bsuir.easyattend.service.RegistrationStatusService;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org. springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -89,5 +91,15 @@ public class RegistrationStatusController {
     public ResponseEntity<Void> deleteRegistrationStatus(@PathVariable Long id) {
         registrationStatusService.deleteRegistrationStatus(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/filtered")
+    public ResponseEntity<List<ConfirmedUserDto>> getConfirmedUsersByEventIdAndLastName(
+            @RequestParam Long eventId,
+            @RequestParam String lastName) {
+        List<ConfirmedUserDto> confirmedUsers
+                = registrationStatusService
+                .getConfirmedUsersByEventIdAndLastName(eventId, lastName);
+        return ResponseEntity.ok(confirmedUsers);
     }
 }

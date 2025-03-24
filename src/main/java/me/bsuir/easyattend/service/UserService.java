@@ -40,8 +40,8 @@ public class UserService {
             PasswordEncoder passwordEncoder,
             RoleService roleService,
             RoleMapper roleMapper,
-            EventRepository eventRepository,       // Inject EventRepository
-            RegistrationStatusRepository registrationStatusRepository // Inject RegistrationStatusRepository
+            EventRepository eventRepository,
+            RegistrationStatusRepository registrationStatusRepository
     ) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
