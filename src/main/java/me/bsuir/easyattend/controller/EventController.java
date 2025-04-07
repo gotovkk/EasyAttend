@@ -72,4 +72,11 @@ public class EventController {
         List<EventAttendeeDto> attendees = eventService.getAttendeesByEventId(id);
         return ResponseEntity.ok(attendees);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteEvent(@PathVariable Long id) {
+        eventService.deleteEvent(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }

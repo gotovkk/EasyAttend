@@ -12,6 +12,7 @@ import me.bsuir.easyattend.model.User;
 import me.bsuir.easyattend.repository.EventRepository;
 import me.bsuir.easyattend.repository.RegistrationStatusRepository;
 import me.bsuir.easyattend.repository.UserRepository;
+import me.bsuir.easyattend.utils.InMemoryCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,18 +24,24 @@ public class EventService {
     private final EventMapper eventMapper;
     private final RegistrationStatusRepository registrationStatusRepository;
     private final UserRepository userRepository;
+    private final InMemoryCache<String, Object> inMemoryCache;
+    private final RegistrationStatusService registrationStatusService;
 
     @Autowired
     public EventService(
             EventRepository eventRepository,
             EventMapper eventMapper,
             UserRepository userRepository,
-            RegistrationStatusRepository registrationStatusRepository
+            RegistrationStatusRepository registrationStatusRepository,
+            InMemoryCache<String, Object> inMemoryCache,
+            RegistrationStatusService registrationStatusService
     ) {
         this.eventRepository = eventRepository;
         this.eventMapper = eventMapper;
         this.userRepository = userRepository;
         this.registrationStatusRepository = registrationStatusRepository;
+        this.inMemoryCache = inMemoryCache;
+        this.registrationStatusService = registrationStatusService;
     }
 
     @Transactional
@@ -111,6 +118,10 @@ public class EventService {
     public void deleteEvent(Long id) {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Event not found with id " + id));
+
+        inMemoryCache.evictByPattern("registrationStatus:filtered:eventId=" + id);
+        inMemoryCache.evictByPattern("registrationStatus:confirmedUsers:eventId=" + id);
+
         eventRepository.delete(event);
     }
 }

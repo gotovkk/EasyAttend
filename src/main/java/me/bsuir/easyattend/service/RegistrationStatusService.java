@@ -16,7 +16,7 @@ import me.bsuir.easyattend.model.User;
 import me.bsuir.easyattend.repository.EventRepository;
 import me.bsuir.easyattend.repository.RegistrationStatusRepository;
 import me.bsuir.easyattend.repository.UserRepository;
-import me.bsuir.easyattend.utils.*;
+import me.bsuir.easyattend.utils.InMemoryCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,9 +28,9 @@ public class RegistrationStatusService {
     private final RegistrationStatusMapper registrationStatusMapper;
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
-    private final EventMapper eventMapper; // Add EventMapper
-    private final InMemoryCache<String, List<RegistrationStatusGetDto>> registrationStatusCache;
-    private final InMemoryCache<String, List<ConfirmedUserDto>> confirmedUsersCache;
+    private final EventMapper eventMapper;
+    private final InMemoryCache<String, Object> inMemoryCache; // Changed type
+    private static final String CACHE_KEY_PREFIX = "registrationStatus";
 
     @Autowired
     public RegistrationStatusService(
@@ -39,21 +39,22 @@ public class RegistrationStatusService {
             EventRepository eventRepository,
             UserRepository userRepository,
             EventMapper eventMapper,
-            InMemoryCache<String, List<RegistrationStatusGetDto>> registrationStatusCache,
-            InMemoryCache<String, List<ConfirmedUserDto>> confirmedUsersCache
+            InMemoryCache<String, Object> inMemoryCache
     ) {
         this.registrationStatusRepository = registrationStatusRepository;
         this.registrationStatusMapper = registrationStatusMapper;
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
         this.eventMapper = eventMapper;
-        this.registrationStatusCache = registrationStatusCache;
-        this.confirmedUsersCache = confirmedUsersCache;
+        this.inMemoryCache = inMemoryCache;
     }
 
+    @Transactional(readOnly = true)
     public List<RegistrationStatusGetDto> getRegistrationStatusesByEventIdAndUserLastName(Long eventId, String lastName) {
-        String cacheKey = "eventId:" + eventId + ",lastName:" + lastName;
-        List<RegistrationStatusGetDto> cachedResult = registrationStatusCache.get(cacheKey);
+
+        String cacheKey = CACHE_KEY_PREFIX + ":filtered:eventId=" + eventId + ",lastName=" + lastName;
+        List<RegistrationStatusGetDto> cachedResult = (List<RegistrationStatusGetDto>) inMemoryCache.get(cacheKey);
+
         if (cachedResult != null) {
             return cachedResult;
         }
@@ -62,8 +63,7 @@ public class RegistrationStatusService {
         List<RegistrationStatusGetDto> dtos = registrationStatuses.stream()
                 .map(registrationStatusMapper::toDto)
                 .collect(Collectors.toList());
-
-        registrationStatusCache.put(cacheKey, dtos);
+        inMemoryCache.put(cacheKey, dtos);
         return dtos;
     }
 
@@ -180,15 +180,23 @@ public class RegistrationStatusService {
                 .collect(Collectors.toList());
     }
 
-    public List<ConfirmedUserDto> getConfirmedUsersByEventIdAndLastName(Long eventId, String lastName) {
-        String cacheKey = "eventId:" + eventId + ",lastName:" + lastName;
-        List<ConfirmedUserDto> cachedResult = confirmedUsersCache.get(cacheKey);
+    @Transactional(readOnly = true)
+    public List<ConfirmedUserDto> getConfirmedUsersByEventIdAndLastName(
+            Long eventId,
+            String lastName
+    ) {
+        String cacheKey = CACHE_KEY_PREFIX + ":confirmedUsers:eventId=" + eventId + ",lastName=" + lastName;
+        List<ConfirmedUserDto> cachedResult = (List<ConfirmedUserDto>) inMemoryCache.get(cacheKey);
         if (cachedResult != null) {
             return cachedResult;
         }
 
-        List<ConfirmedUserDto> confirmedUsers = registrationStatusRepository.findConfirmedUsersByEventIdAndLastName(eventId, lastName);
-        confirmedUsersCache.put(cacheKey, confirmedUsers);
+        List<ConfirmedUserDto> confirmedUsers
+                = registrationStatusRepository.findConfirmedUsersByEventIdAndLastName(
+                eventId,
+                lastName
+        );
+        inMemoryCache.put(cacheKey, confirmedUsers);
         return confirmedUsers;
     }
 }
