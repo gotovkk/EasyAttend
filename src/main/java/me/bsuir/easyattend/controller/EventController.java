@@ -2,6 +2,7 @@ package me.bsuir.easyattend.controller;
 
 import jakarta.validation.Valid;
 import java.util.List;
+import me.bsuir.easyattend.annotation.Timed;
 import me.bsuir.easyattend.dto.create.EventCreateDto;
 import me.bsuir.easyattend.dto.get.EventAttendeeDto;
 import me.bsuir.easyattend.dto.get.EventGetDto;
@@ -30,6 +31,7 @@ public class EventController {
     }
 
     @GetMapping("/{id}")
+    @Timed
     public ResponseEntity<EventGetDto> getEventById(@PathVariable Long id) {
         EventGetDto event = eventService.getEventById(id);
         return ResponseEntity.ok(event);

@@ -23,7 +23,10 @@ public interface RegistrationStatusRepository extends JpaRepository<Registration
     void deleteByEventIdAndUserId(Long eventId, Long userId);
 
     @Query("SELECT rs FROM RegistrationStatus rs WHERE rs.event.id = :eventId AND rs.user.lastName LIKE %:lastName%")
-    List<RegistrationStatus> findByEventIdAndUserLastName(@Param("eventId") Long eventId, @Param("lastName") String lastName);
+    List<RegistrationStatus> findByEventIdAndUserLastName(
+            @Param("eventId") Long eventId,
+            @Param("lastName") String lastName
+    );
 
 
     @SuppressWarnings("checkstyle:OperatorWrap")

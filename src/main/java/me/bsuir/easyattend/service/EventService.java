@@ -50,6 +50,7 @@ public class EventService {
     }
 
     @Transactional(readOnly = true)
+
     public EventGetDto getEventById(Long id) {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Event not found with id " + id));

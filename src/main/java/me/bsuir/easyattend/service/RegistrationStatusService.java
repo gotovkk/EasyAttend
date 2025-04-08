@@ -50,16 +50,21 @@ public class RegistrationStatusService {
     }
 
     @Transactional(readOnly = true)
-    public List<RegistrationStatusGetDto> getRegistrationStatusesByEventIdAndUserLastName(Long eventId, String lastName) {
+    public List<RegistrationStatusGetDto> getRegistrationStatusesByEventIdAndUserLastName(
+            Long eventId,
+            String lastName) {
 
-        String cacheKey = CACHE_KEY_PREFIX + ":filtered:eventId=" + eventId + ",lastName=" + lastName;
-        List<RegistrationStatusGetDto> cachedResult = (List<RegistrationStatusGetDto>) inMemoryCache.get(cacheKey);
+        String cacheKey =
+                CACHE_KEY_PREFIX + ":filtered:eventId=" + eventId + ",lastName=" + lastName;
+        List<RegistrationStatusGetDto> cachedResult =
+                (List<RegistrationStatusGetDto>) inMemoryCache.get(cacheKey);
 
         if (cachedResult != null) {
             return cachedResult;
         }
 
-        List<RegistrationStatus> registrationStatuses = registrationStatusRepository.findByEventIdAndUserLastName(eventId, lastName);
+        List<RegistrationStatus> registrationStatuses
+                = registrationStatusRepository.findByEventIdAndUserLastName(eventId, lastName);
         List<RegistrationStatusGetDto> dtos = registrationStatuses.stream()
                 .map(registrationStatusMapper::toDto)
                 .collect(Collectors.toList());
@@ -185,7 +190,8 @@ public class RegistrationStatusService {
             Long eventId,
             String lastName
     ) {
-        String cacheKey = CACHE_KEY_PREFIX + ":confirmedUsers:eventId=" + eventId + ",lastName=" + lastName;
+        String cacheKey =
+                CACHE_KEY_PREFIX + ":confirmedUsers:eventId=" + eventId + ",lastName=" + lastName;
         List<ConfirmedUserDto> cachedResult = (List<ConfirmedUserDto>) inMemoryCache.get(cacheKey);
         if (cachedResult != null) {
             return cachedResult;

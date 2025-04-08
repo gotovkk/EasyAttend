@@ -50,11 +50,10 @@ public class UserService {
         this.roleMapper = roleMapper;
     }
 
-    @Transactional(readOnly = true)
     public UserGetDto getUserById(Long id) {
-        User user = userRepository.findById(id)
+        return userRepository.findById(id)
+                .map(userMapper::toDto)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + id));
-        return userMapper.toDto(user);
     }
 
     @Transactional(readOnly = true)
