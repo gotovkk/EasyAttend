@@ -14,12 +14,10 @@ public class LoggerAspect {
 
     private static final Logger logger = LoggerFactory.getLogger(LoggerAspect.class);
 
-    // Поинткат для методов с аннотацией @Timed
     @Pointcut("@annotation(me.bsuir.easyattend.annotation.Timed)")
     public void logTimePointcut() {
     }
 
-    // Замер времени выполнения методов с @Timed
     @Around("logTimePointcut()")
     public Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
         long startTime = System.currentTimeMillis();
@@ -37,12 +35,10 @@ public class LoggerAspect {
         return result;
     }
 
-    // Поинткат для всех методов в пакете me.bsuir.easyattend
     @Pointcut("execution(* me.bsuir.easyattend..*.*(..))")
     public void methodsExecuted() {
     }
 
-    // Логирование вызова всех методов
     @Around("methodsExecuted()")
     public Object logMethodEntry(ProceedingJoinPoint joinPoint) throws Throwable {
         String className = joinPoint.getSignature().getDeclaringTypeName();

@@ -50,6 +50,7 @@ public class UserService {
         this.roleMapper = roleMapper;
     }
 
+    @Transactional(readOnly = true)
     public UserGetDto getUserById(Long id) {
         return userRepository.findById(id)
                 .map(userMapper::toDto)
@@ -60,7 +61,8 @@ public class UserService {
     public List<UserGetDto> getAllUsers() {
         List<User> users = userRepository.findAll();
         return users.stream()
-                .map(userMapper::toDto).toList();
+                .map(userMapper::toDto)
+                .toList();
     }
 
     @Transactional
@@ -73,17 +75,12 @@ public class UserService {
         if (userCreateDto.getRoleIds() != null && !userCreateDto.getRoleIds().isEmpty()) {
             userCreateDto.getRoleIds().forEach(roleId -> {
                 Role role = roleRepository.findById(roleId)
-                        .orElseThrow(()
-                                -> new ResourceNotFoundException(
-                                "Role not found with id "
-                                        + roleId));
+                        .orElseThrow(() -> new ResourceNotFoundException("Role not found with id " + roleId));
                 roles.add(role);
             });
         } else {
-            // Assign default "USER" role if no roles are specified
             Role userRole = roleRepository.findByName(RoleType.USER)
                     .orElseGet(() -> {
-                        // If "USER" role doesn't exist, create it
                         Role newRole = new Role();
                         newRole.setName(RoleType.USER);
                         return roleRepository.save(newRole);
@@ -94,15 +91,59 @@ public class UserService {
 
         User savedUser = userRepository.save(user);
         UserGetDto userDto = userMapper.toDto(savedUser);
-        Set<RoleGetDto> roleGetDtos
-                = savedUser
-                .getRoles()
-                .stream()
+        Set<RoleGetDto> roleGetDtos = savedUser.getRoles().stream()
                 .map(roleMapper::toDto)
                 .collect(Collectors.toSet());
         userDto.setRoles(roleGetDtos);
 
         return userDto;
+    }
+
+    @Transactional
+    public List<UserGetDto> createUsersBulk(List<UserCreateDto> userCreateDtos) {
+        List<User> usersToCreate = userCreateDtos.stream()
+                .filter(dto -> userRepository.findByUsername(dto.getUsername()).isEmpty())
+                .map(dto -> {
+                    User user = userMapper.toEntity(dto);
+                    user.setPassword(passwordEncoder.encode(dto.getPassword()));
+                    user.setRegistrationDate(LocalDateTime.now());
+
+                    Set<Role> roles = new HashSet<>();
+                    if (dto.getRoleIds() != null && !dto.getRoleIds().isEmpty()) {
+                        roles = dto.getRoleIds().stream()
+                                .map(roleId -> roleRepository.findById(roleId)
+                                        .orElseThrow(() -> new ResourceNotFoundException("Role not found with id " + roleId)))
+                                .collect(Collectors.toSet());
+                    } else {
+                        Role userRole = roleRepository.findByName(RoleType.USER)
+                                .orElseGet(() -> {
+                                    Role newRole = new Role();
+                                    newRole.setName(RoleType.USER);
+                                    return roleRepository.save(newRole);
+                                });
+                        roles.add(userRole);
+                    }
+                    user.setRoles(roles);
+
+                    return user;
+                })
+                .toList();
+
+        if (usersToCreate.isEmpty()) {
+            throw new IllegalArgumentException("No new users to create. All provided users already exist.");
+        }
+
+        List<User> savedUsers = userRepository.saveAll(usersToCreate);
+        return savedUsers.stream()
+                .map(savedUser -> {
+                    UserGetDto userDto = userMapper.toDto(savedUser);
+                    Set<RoleGetDto> roleGetDtos = savedUser.getRoles().stream()
+                            .map(roleMapper::toDto)
+                            .collect(Collectors.toSet());
+                    userDto.setRoles(roleGetDtos);
+                    return userDto;
+                })
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -120,9 +161,7 @@ public class UserService {
             Set<Role> newRoles = new HashSet<>();
             for (Long roleId : userCreateDto.getRoleIds()) {
                 Role role = roleRepository.findById(roleId)
-                        .orElseThrow(()
-                                -> new ResourceNotFoundException(
-                                "Role not found with id " + roleId));
+                        .orElseThrow(() -> new ResourceNotFoundException("Role not found with id " + roleId));
                 newRoles.add(role);
             }
             user.setRoles(newRoles);

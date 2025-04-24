@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class GlobalExceptionHandler {
 
   @SuppressWarnings("checkstyle:Indentation")
-  @ExceptionHandler(EventNotFoundException.class)
-  public ResponseEntity<String> handleEventNotFoundException(EventNotFoundException ex) {
+  @ExceptionHandler(IllegalArgumentException.class)
+  public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex) {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
   }
 }

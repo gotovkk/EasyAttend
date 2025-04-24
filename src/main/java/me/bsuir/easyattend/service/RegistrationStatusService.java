@@ -29,7 +29,7 @@ public class RegistrationStatusService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final EventMapper eventMapper;
-    private final InMemoryCache<String, Object> inMemoryCache; // Changed type
+    private final InMemoryCache<String, Object> inMemoryCache;
     private static final String CACHE_KEY_PREFIX = "registrationStatus";
 
     @Autowired

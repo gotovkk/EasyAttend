@@ -22,7 +22,8 @@ public interface RegistrationStatusRepository extends JpaRepository<Registration
     @Transactional
     void deleteByEventIdAndUserId(Long eventId, Long userId);
 
-    @Query("SELECT rs FROM RegistrationStatus rs WHERE rs.event.id = :eventId AND rs.user.lastName LIKE %:lastName%")
+    @Query("SELECT rs FROM RegistrationStatus rs "
+            + "WHERE rs.event.id = :eventId AND rs.user.lastName LIKE %:lastName%")
     List<RegistrationStatus> findByEventIdAndUserLastName(
             @Param("eventId") Long eventId,
             @Param("lastName") String lastName
@@ -30,9 +31,11 @@ public interface RegistrationStatusRepository extends JpaRepository<Registration
 
 
     @SuppressWarnings("checkstyle:OperatorWrap")
-    @Query("SELECT new me.bsuir.easyattend.dto.get.ConfirmedUserDto(rs.user.id, rs.user.firstName, rs.user.lastName) " +
+    @Query("SELECT new me.bsuir.easyattend.dto.get.ConfirmedUserDto(" +
+            "rs.user.id, rs.user.firstName, rs.user.lastName) " +
             "FROM RegistrationStatus rs " +
-            "WHERE rs.event.id = :eventId AND rs.status = 'CONFIRMED' AND rs.user.lastName LIKE %:lastName%")
+            "WHERE rs.event.id = :eventId " +
+            "AND rs.status = 'CONFIRMED' AND rs.user.lastName LIKE %:lastName%")
     List<ConfirmedUserDto> findConfirmedUsersByEventIdAndLastName(
             @Param("eventId") Long eventId,
             @Param("lastName") String lastName
